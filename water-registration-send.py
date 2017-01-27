@@ -3,12 +3,17 @@ from datetime import datetime
 import shutil
 import os
 import time
+import requests
+import json
 
 # init
 data_dir = '/data/nuts'
 data_dir_ready_to_send = data_dir+'/ready_to_send'
 data_dir_processed = data_dir+'/processed'
 logfileName = data_dir+'/nuts_send_service.log'
+
+webserviceUrl = 'http://www.grootwassink.nl/nuts/api/v1/api.php/water'
+headers = {'Content-type': 'application/json'}
 
 def log(message):
     logtime_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")    
@@ -30,7 +35,10 @@ while (1 == 1):
                 f.close()
             
             # send json_message to webserver
-
+            r = requests.post(webserviceUrl, data=json_message, headers=headers)
+            if (r.status_code != 200):
+                log(r.text)
+    
             # move file
             shutil.move(fNameReadyToSend, fNameProcessed)
 
